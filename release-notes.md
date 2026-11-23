@@ -1,3 +1,23 @@
+# 1.1.72
+
+## 中文
+
+- 版本 **1.1.72**。适配 dsh **0.2.2-rc.1**（`dshTarget` 已更新）。
+- **修 `{{cwd}}` 组装报错**：0.2.2-rc.1 起提示词变量只剩 `provider` / `model`，工作目录改走 runtime context。此时仍带 `{{cwd}}` 的段会在组装时抛「未知变量」，导致这一轮整条消息失败。现在检测宿主是否注册了 `cwd`，没有就换成常量句 `Your working directory is the session workspace.`，身份覆盖段的兜底后缀也同步切换。
+- **修演练台三个插件行挂载不上**：bundle 补丁层按 name 解析 `dsh-purge/redteam*`，profile 里 link 进来时解析不到，行一直 pending，只打一行 `patch: entry not found`。本版由插件自己把 `redteam` / `redteam-store` / `redteam-ui` 挂进根上下文，路径从 `import.meta.url` 推出，不依赖包名解析。已经挂过的服务不再重复挂第二份，行失败只 warn 不影响宿主启动。
+- **修演练台只剩一半**：`redteam/store` 与 `redteam/ui` 只有命名导出、没有 default 导出，之前自挂载只认 default 就把这两行静默跳过（服务 `redteam` 缺失、HTTP 桥不工作）。现在 default 不是可 apply 的插件对象时回退到命名导出。
+- 补上 `dsh.client.entry`，宿主能按 manifest 找到客户端 bundle。
+- 启动冒烟（`scripts/smoke-boot.mjs`）实测：4 个工具、4 条命令、`redteam` + `redteamMode` 两个服务、提示词组装 8 段且变量只剩 `provider,model`、client bundle 已进组合图并能取到。
+
+## English
+
+- **1.1.72**. Targets dsh **0.2.2-rc.1**.
+- **Fix `{{cwd}}` assembly failure**: since 0.2.2-rc.1 the prompt variables are only `provider` / `model`, and the working directory comes from the runtime context. A section that still carries `{{cwd}}` throws on assembly and fails the whole turn. The plugin now checks whether the host registered `cwd` and, when it has not, substitutes the constant sentence `Your working directory is the session workspace.`, including the identity-overlay fallback suffix.
+- **Fix the three drill rows never mounting**: the bundle patch layer resolves `dsh-purge/redteam*` by name, which a linked profile dev install cannot resolve, so the rows stay pending with a single `patch: entry not found` warning. The plugin now mounts `redteam` / `redteam-store` / `redteam-ui` into the root context itself, resolving paths from `import.meta.url` instead of package-name resolution. Already-mounted services are skipped, and a failed row only warns instead of breaking host startup.
+- **Fix half a drill**: `redteam/store` and `redteam/ui` only have named exports, so the previous default-only loader silently skipped them — no `redteam` service and no HTTP bridge. The loader now falls back to named exports when `default` is not an appliable plugin.
+- Added `dsh.client.entry` so the host can locate the client bundle from the manifest.
+- Verified with the boot smoke test (`scripts/smoke-boot.mjs`): 4 tools, 4 commands, both `redteam` + `redteamMode` services, 8-section prompt assembly with variables `provider,model` only, and the client bundle present in the boot graph and served with 200.
+
 # 1.1.71
 
 ## 中文
