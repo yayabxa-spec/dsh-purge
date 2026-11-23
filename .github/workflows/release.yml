@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-  # 允许在 Actions 页面手动跑一次（补发漏掉的版本、或网络抖动后重试）。
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,9 +14,7 @@ concurrency:
 
 jobs:
   release:
-    # 此前写死成 'YuJunZhiXue/dsh-purge'，fork 里推 master 会被直接跳过、什么都不发。
-    # 改成跟随实际所在仓库：上游和任何 fork 都能出 Release，不需要各改一份。
-    if: github.repository_owner != '' && github.event_name != 'pull_request'
+    if: github.repository == 'YuJunZhiXue/dsh-purge'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,4 +59,4 @@ jobs:
           fi
           test -s "$zip"
           gh release upload "$tag" "$zip" --clobber
-          echo "published https://github.com/${GITHUB_REPOSITORY}/releases/tag/${tag}"
+          echo "published https://github.com/YuJunZhiXue/dsh-purge/releases/tag/${tag}"

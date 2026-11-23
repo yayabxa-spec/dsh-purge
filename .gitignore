@@ -32,6 +32,3 @@ default-prompt-inject.md
 /official-harness-payload.7z
 *.asar
 *.asar.bak
-
-# 本机 npm 安装时的自指软链接，不进仓库
-.tmp-dsh-purge
